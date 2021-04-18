@@ -20,7 +20,8 @@ class GaussianPolicy(LatentSpacePolicy):
         self._deterministic = False
 
         super(GaussianPolicy, self).__init__(*args, **kwargs)
-
+        # 将output size 一分为二的模型，分别作为scale 和 shift. 输入input
+        # 推理出 scale 和 shift
         self.shift_and_scale_model = self._shift_and_scale_diag_net(
             inputs=self.inputs,
             output_size=np.prod(self._output_shape) * 2)
@@ -47,7 +48,7 @@ class GaussianPolicy(LatentSpacePolicy):
         first_observation = tree.flatten(observations)[0]
         first_input_rank = tf.size(tree.flatten(self._input_shapes)[0])
         batch_shape = tf.shape(first_observation)[:-first_input_rank]
-
+        # 输出 shift 和 scale 的神经网路
         shifts, scales = self.shift_and_scale_model(observations)
 
         if self._deterministic:
