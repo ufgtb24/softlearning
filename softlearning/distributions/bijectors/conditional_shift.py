@@ -61,4 +61,5 @@ class ConditionalShift(tfb.Bijector):
         # is_constant_jacobian = True for this bijector, hence the
         # `log_det_jacobian` need only be specified for a single input, as this will
         # be tiled to match `event_ndims`.
+        # det=1 所以 log_det=0, 但是 计算 transformed distribution 用的是det=1，而不是 log_det
         return tf.zeros((), dtype=dtype_util.base_dtype(x.dtype))

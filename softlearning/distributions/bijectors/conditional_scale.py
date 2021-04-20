@@ -32,6 +32,7 @@ class ConditionalScale(bijector.Bijector):
         parameters = dict(locals())
         with tf.name_scope(name) as name:
             super(ConditionalScale, self).__init__(
+                # 规定了输入的 event 是 rank=1 的，和 MultivariateNormalDiag 冲突，因为协方差为0，相互独立
                 forward_min_event_ndims=0,
                 is_constant_jacobian=True,
                 validate_args=validate_args,
