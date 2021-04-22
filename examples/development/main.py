@@ -6,7 +6,8 @@ import sys
 import json
 
 import tensorflow as tf
-import tree
+# import sklearn.tree as Tree
+import Tree
 import ray
 from ray import tune
 
@@ -56,7 +57,7 @@ class ExperimentRunner(tune.Trainable):
                 training_environment.observation_shape,
                 training_environment.action_shape),
         })
-        Qs = self.Qs = tree.flatten(value_functions.get(variant['Q_params']))
+        Qs = self.Qs = Tree.flatten(value_functions.get(variant['Q_params']))
 
         variant['policy_params']['config'].update({
             'action_range': (training_environment.action_space.low,
@@ -159,7 +160,7 @@ class ExperimentRunner(tune.Trainable):
             self.training_environment, self.policy, self.replay_pool)
 
     def _save_value_functions(self, checkpoint_dir):
-        tree.map_structure_with_path(
+        Tree.map_structure_with_path(
             lambda path, Q: Q.save_weights(
                 os.path.join(
                     checkpoint_dir, '-'.join(('Q', *[str(x) for x in path]))),
@@ -167,7 +168,7 @@ class ExperimentRunner(tune.Trainable):
             self.Qs)
 
     def _restore_value_functions(self, checkpoint_dir):
-        tree.map_structure_with_path(
+        Tree.map_structure_with_path(
             lambda path, Q: Q.load_weights(
                 os.path.join(
                     checkpoint_dir, '-'.join(('Q', *[str(x) for x in path])))),
@@ -203,7 +204,7 @@ class ExperimentRunner(tune.Trainable):
         # NOTE(hartikainen): We need to run one step on optimizers s.t. the
         # variables get initialized.
         # TODO(hartikainen): This should be done somewhere else.
-        tree.map_structure(
+        Tree.map_structure(
             lambda Q_optimizer, Q: Q_optimizer.apply_gradients([
                 (tf.zeros_like(variable), variable)
                 for variable in Q.trainable_variables
@@ -270,4 +271,21 @@ def main(argv=None):
 
 
 if __name__ == '__main__':
-    main(argv=sys.argv[1:])
+    # main(argv=sys.argv[1:])
+
+    input = [
+             '--algorithm=SAC ',
+             '--universe=gym',
+             '--domain=HalfCheetah',
+             '--task=v3',
+             '--exp-name=my-sac-experiment-1',
+             '--checkpoint-frequency=1000',
+             '--restore=${SAC_CHECKPOINT_PATH}'
+    ]
+    
+        
+        
+
+
+    # main(argv=sys.argv[1:])
+    main(argv=input)

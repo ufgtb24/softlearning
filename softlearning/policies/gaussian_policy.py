@@ -25,7 +25,7 @@ class GaussianPolicy(LatentSpacePolicy):
         self.shift_and_scale_model = self._shift_and_scale_diag_net(
             inputs=self.inputs,
             output_size=np.prod(self._output_shape) * 2)
-
+        # 协方差为0的多元正态分布  等价于  多个独立同分布的一元正态分布的联合分布
         base_distribution = tfp.distributions.MultivariateNormalDiag(
             loc=tf.zeros(self._output_shape),
             scale_diag=tf.ones(self._output_shape))
@@ -37,6 +37,8 @@ class GaussianPolicy(LatentSpacePolicy):
 
         self.base_distribution = base_distribution
         self.raw_action_distribution = raw_action_distribution
+        
+        # squash
         self.action_distribution = self._action_post_processor(
             raw_action_distribution)
 
@@ -269,10 +271,13 @@ class FeedforwardGaussianPolicy(GaussianPolicy):
             activation=self._activation,
             output_activation=self._output_activation
         )(preprocessed_inputs)
-
+        
+        
         shift, scale = tf.keras.layers.Lambda(
             lambda x: tf.split(x, num_or_size_splits=2, axis=-1)
         )(shift_and_scale_diag)
+        
+        # 限制scale为正数
         scale = tf.keras.layers.Lambda(
             lambda x: tf.math.softplus(x) + 1e-5)(scale)
         shift_and_scale_diag_model = tf.keras.Model(inputs, (shift, scale))
