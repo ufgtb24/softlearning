@@ -15,6 +15,7 @@ NUM_COUPLING_LAYERS = 2
 
 
 ALGORITHM_PARAMS_BASE = {
+    
     'config': {
         'train_every_n_steps': 1,
         'n_train_repeat': 1,

@@ -260,7 +260,8 @@ def class_and_config_for_serialized_softlearning_object(
         custom_objects=None,
         printable_module_name='object'):
     """Returns the class name and config for a serialized softlearning object."""
-    if (not isinstance(config, dict) or 'class_name' not in config or
+    if (not isinstance(config, dict) or
+            'class_name' not in config or
         'config' not in config):
         raise ValueError(f"Improper config format: {config}")
 
