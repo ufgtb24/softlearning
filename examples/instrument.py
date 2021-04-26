@@ -231,7 +231,7 @@ def run_example_local(example_module_name, example_argv, local_mode=True):
         num_cpus=example_args.cpus,
         num_gpus=example_args.gpus,
         resources=example_args.resources or {},
-        local_mode=local_mode,
+        local_mode=True,
         include_dashboard=example_args.include_dashboard,
         _temp_dir=example_args.temp_dir)
 
