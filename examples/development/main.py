@@ -229,6 +229,7 @@ class ExperimentRunner(tune.Trainable):
         status.assert_consumed().run_restore_ops()
 
     def save_checkpoint(self, checkpoint_dir):
+        print('checkpoint_dir = ',checkpoint_dir)
         """Implements the checkpoint save logic."""
         self._save_replay_pool(checkpoint_dir)
         self._save_sampler(checkpoint_dir)
