@@ -300,9 +300,11 @@ def deserialize_softlearning_object(identifier,
                                     module_objects=None,
                                     custom_objects=None,
                                     printable_module_name='object'):
+    
+    # 根据类(例如一种policy)的配置，创建一个类的对象
     if identifier is None:
         return None
-
+    # policy  replay_pool
     if isinstance(identifier, dict):
         # In this case we are dealing with a Softlearning config dictionary.
         config = identifier
@@ -322,13 +324,15 @@ def deserialize_softlearning_object(identifier,
                         list(custom_objects.items())))
             with CustomObjectScope(custom_objects):
                 return cls.from_config(cls_config)
-        else:
+        else:  # 创建 SAC 使用这个方法
             # Then `cls` may be a function returning a class.
             # in this case by convention `config` holds
             # the kwargs of the function.
             custom_objects = custom_objects or {}
             with CustomObjectScope(custom_objects):
                 return cls(**cls_config)
+            
+    # Qs
     elif isinstance(identifier, str):
         object_name = identifier
         if custom_objects and object_name in custom_objects:

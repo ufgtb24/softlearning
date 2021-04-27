@@ -42,6 +42,15 @@ class ExperimentRunner(tune.Trainable):
         self._built = False
 
     def _build(self):
+        '''
+        variant['something params']是关于 something 的创建参数，
+        其中又包含  variant['something params']['class_name']
+        和 variant['something params']['config']
+        两项。
+        
+        用这两项可以创建一个对象实例
+        '''
+        
         variant = copy.deepcopy(self._variant)
         environment_params = variant['environment_params']
         training_environment = self.training_environment = (
@@ -56,6 +65,7 @@ class ExperimentRunner(tune.Trainable):
                 training_environment.observation_shape,
                 training_environment.action_shape),
         })
+        # 根据配置获取一个函数(包含神经网络)的实例
         Qs = self.Qs = tree.flatten(value_functions.get(variant['Q_params']))
 
         variant['policy_params']['config'].update({
@@ -69,16 +79,21 @@ class ExperimentRunner(tune.Trainable):
         variant['replay_pool_params']['config'].update({
             'environment': training_environment,
         })
+        # 参考 value_functions.get， 根据配置获取实例
         replay_pool = self.replay_pool = replay_pools.get(
             variant['replay_pool_params'])
-
+        
+        # 用 variant 中的下层配置创建下层对象，并用下层对象给上层配置(config)赋值
         variant['sampler_params']['config'].update({
             'environment': training_environment,
             'policy': policy,
             'pool': replay_pool,
         })
+        # 用上层配置创建上层对象
         sampler = self.sampler = samplers.get(variant['sampler_params'])
-
+        
+        
+        # 用 variant 中的下层配置创建下层对象，并用下层对象给上层配置赋值
         variant['algorithm_params']['config'].update({
             'training_environment': training_environment,
             'evaluation_environment': evaluation_environment,
@@ -87,11 +102,14 @@ class ExperimentRunner(tune.Trainable):
             'pool': replay_pool,
             'sampler': sampler
         })
+        # 用上层配置创建上层对象，创建 RL 算法，包含所有运算模块
         self.algorithm = algorithms.get(variant['algorithm_params'])
 
         self._built = True
 
     def step(self):
+        # trainable 的关键步骤 ，和RL算法类的结合
+        # trainable 的 step 调用 RL 的 train
         if not self._built:
             self._build()
 

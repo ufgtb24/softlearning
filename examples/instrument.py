@@ -220,9 +220,11 @@ Number of total trials (including samples/seeds): {total_number_of_trials}
 def run_example_local(example_module_name, example_argv, local_mode=True):
     """Run example locally, potentially parallelizing across cpus/gpus."""
     example_module = importlib.import_module(example_module_name)
-
+    # 实验属性的生成
     example_args = example_module.get_parser().parse_args(example_argv)
+    # 实例对象的配置文件的生成（根据上述实验属性）
     variant_spec = example_module.get_variant_spec(example_args)
+    # ray.tune 的 trainable class 的实例化
     trainable_class = example_module.get_trainable_class(example_args)
 
     experiment_kwargs = generate_experiment_kwargs(variant_spec, example_args)

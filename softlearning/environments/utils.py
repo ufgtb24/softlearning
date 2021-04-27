@@ -37,5 +37,5 @@ def get_environment_from_params(environment_params):
     task = environment_params['task']
     domain = environment_params['domain']
     environment_kwargs = environment_params.get('kwargs', {}).copy()
-
+    # 获取一个gym的 env 对象，含有 step reset 等功能
     return get_environment(universe, domain, task, environment_kwargs)

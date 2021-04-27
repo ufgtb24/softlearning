@@ -524,9 +524,11 @@ def get_variant_spec_image(universe,
                            algorithm,
                            *args,
                            **kwargs):
+    # 所有模块的设置
     variant_spec = get_variant_spec_base(
         universe, domain, task, policy, algorithm, *args, **kwargs)
 
+    # Q  policy 的图像场景设置
     if is_image_env(universe, domain, task, variant_spec):
         preprocessor_params = {
             'class_name': 'convnet_preprocessor',
@@ -566,6 +568,7 @@ def get_variant_spec_image(universe,
 
 
 def get_variant_spec(args):
+    # 用来创建模块对象实例的配置参数的赋值创建
     universe, domain, task = args.universe, args.domain, args.task
 
     variant_spec = get_variant_spec_image(

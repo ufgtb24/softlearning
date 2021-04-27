@@ -14,6 +14,7 @@ def get_trainable_class(*args, **kwargs):
 def get_variant_spec(command_line_args, *args, **kwargs):
     # command_line_args 是 parser 解析出的结果加部分默认值
     from .variants import get_variant_spec
+    # 实例对象的配置文件的生成
     variant_spec = get_variant_spec(command_line_args, *args, **kwargs)
     return variant_spec
 

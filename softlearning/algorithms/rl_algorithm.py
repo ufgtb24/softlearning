@@ -231,7 +231,7 @@ class RLAlgorithm(Checkpointable):
             }
 
             # TODO(hartikainen/tf2): Fix the naming of training/update
-            # diagnostics/metric
+            # diagnostics/metric  # ray.tune step 中要求返回 dict 形式的 metrics
             diagnostics.update((
                 ('evaluation', evaluation_metrics),
                 ('training', training_metrics),

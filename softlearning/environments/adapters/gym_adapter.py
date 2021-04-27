@@ -88,7 +88,7 @@ class GymAdapter(SoftlearningEnv):
             # therefore the environment is not Markovian (terminal condition
             # depends on time rather than state).
             env = env.env
-
+        # wrappers 的作用就是做数据的适配，使得现实问题的数据格式能和标准环境的数据对接
         if rescale_observation_range:
             env = RescaleObservation(env, *rescale_observation_range)
 
