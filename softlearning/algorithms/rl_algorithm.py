@@ -173,7 +173,8 @@ class RLAlgorithm(Checkpointable):
 
                 self._timestep_before_hook()
                 gt.stamp('timestep_before_hook')
-
+                
+                # 运行policy 采样，添加到 pool
                 self._do_sampling(timestep=self._total_timestep)
                 gt.stamp('sample')
 

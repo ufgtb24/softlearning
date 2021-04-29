@@ -68,13 +68,13 @@ class SimpleSampler(BaseSampler):
             next_observation=next_observation,
             info=info,
         )
-
+        # _current_path 保存当前 epoch 的sample，epoch结束会清零
         self._current_path.append(processed_sample)
 
         if terminal or self._path_length >= self._max_path_length:
             last_path = tree.map_structure(
                 lambda *x: np.stack(x, axis=0), *self._current_path)
-
+            # SimpleReplayPool->FlexibleReplayPool
             self.pool.add_path({
                 key: value
                 for key, value in last_path.items()

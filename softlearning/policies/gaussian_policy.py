@@ -56,7 +56,7 @@ class GaussianPolicy(LatentSpacePolicy):
         if self._deterministic:
             actions = self._action_post_processor(shifts)
         else:
-            # sample 如何求导
+            # sample 如何求导，将base_distribution的采样值作为常数！
             actions = self.action_distribution.sample(
                 batch_shape,
                 bijector_kwargs={'scale': {'scale': scales},
