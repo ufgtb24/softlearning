@@ -72,11 +72,13 @@ class SimpleSampler(BaseSampler):
         self._current_path.append(processed_sample)
 
         if terminal or self._path_length >= self._max_path_length:
+            # https://tree.readthedocs.io/en/latest/api.html
+            # 1000 x dict(6(1))--> dict(6(1000))
             last_path = tree.map_structure(
                 lambda *x: np.stack(x, axis=0), *self._current_path)
             # SimpleReplayPool->FlexibleReplayPool
             self.pool.add_path({
-                key: value
+                key: value   # value.shape=(1000)
                 for key, value in last_path.items()
                 if key != 'infos'
             })

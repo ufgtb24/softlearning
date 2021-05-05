@@ -42,8 +42,10 @@ class FlexibleReplayPool(ReplayPool):
 
         max_size = int(max_size)
         self._max_size = max_size
-
-        self.fields = {**fields, **INDEX_FIELDS}
+        # dict 拼接
+        self.fields = {**fields, **INDEX_FIELDS} #
+        # 对一个复杂结构（list,array,dict 等，可以嵌套）的叶子节点（Field类型）调用函数，
+        # 并用返回值替换叶子节点
         self.data = tree.map_structure(self._initialize_field, self.fields)
 
         self._pointer = 0
@@ -90,6 +92,7 @@ class FlexibleReplayPool(ReplayPool):
         self.add_samples(samples)
 
     def add_samples(self, samples):
+        # samples: dict(7(1000))
         num_samples = tree.flatten(samples)[0].shape[0]
 
         assert (('episode_index_forwards' in samples.keys())
@@ -118,19 +121,20 @@ class FlexibleReplayPool(ReplayPool):
         self._advance(num_samples)
 
     def add_path(self, path):
+        # path: dict 6(1000)
         path = path.copy()
         path_length = tree.flatten(path)[0].shape[0]
         path.update({
             'episode_index_forwards': np.arange(
                 path_length,
                 dtype=self.fields['episode_index_forwards'].dtype
-            )[..., np.newaxis],
+            )[..., np.newaxis],   #[0...999]
             'episode_index_backwards': np.arange(
                 path_length,
                 dtype=self.fields['episode_index_backwards'].dtype
-            )[::-1, np.newaxis],
+            )[::-1, np.newaxis],    ##[999...0]
         })
-
+        # path: dict(7(1000))
         return self.add_samples(path)
 
     def random_indices(self, batch_size):
