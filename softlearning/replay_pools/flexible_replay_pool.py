@@ -106,15 +106,18 @@ class FlexibleReplayPool(ReplayPool):
                 (num_samples, *self.fields['episode_index_backwards'].shape),
                 self.fields['episode_index_backwards'].default_value,
                 dtype=self.fields['episode_index_backwards'].dtype)
-
+            
+        # 不会超过最大容量
         index = np.arange(
             self._pointer, self._pointer + num_samples) % self._max_size
-
+        
         def add_sample(path, data, new_values, field):
             assert new_values.shape[0] == num_samples, (
                 new_values.shape, num_samples)
             data[index] = new_values
-
+        # map_structure_with_path 中， dict 是外部结构不是叶子节点，多个dict 必须key 相同，value可相互运算
+        # 才能对 value 的叶子节点进行对应运算.func 中的 path 是 dict 的 key,如果是嵌套的,tuple 就是两个 key
+        # 对 self.data 的每个 key 对应的value进行操作. map_structure 是对
         tree.map_structure_with_path(
             add_sample, self.data, samples, self.fields)
 
@@ -123,6 +126,7 @@ class FlexibleReplayPool(ReplayPool):
     def add_path(self, path):
         # path: dict 6(1000)
         path = path.copy()
+        # flatten 遇到dict只消除到 value 一级
         path_length = tree.flatten(path)[0].shape[0]
         path.update({
             'episode_index_forwards': np.arange(

@@ -59,7 +59,7 @@ class SimpleSampler(BaseSampler):
         self._path_length += 1
         self._path_return += reward
         self._total_samples += 1
-
+        # 一个时刻的sample dict(6)
         processed_sample = self._process_sample(
             observation=self._current_observation,
             action=action,
@@ -70,21 +70,25 @@ class SimpleSampler(BaseSampler):
         )
         # _current_path 保存当前 epoch 的sample，epoch结束会清零
         self._current_path.append(processed_sample)
-
+        
+        # _max_path_length=1000 积累 1000个时刻
         if terminal or self._path_length >= self._max_path_length:
             # https://tree.readthedocs.io/en/latest/api.html
             # 1000 x dict(6(1))--> dict(6(1000))
+            # dict 是外部结构，不同dicts 相同的 key 的 value 之间进行运算，value是叶子节点
+            # map_structure 就是保存外部结构，对应的叶子节点之间进行运算
             last_path = tree.map_structure(
                 lambda *x: np.stack(x, axis=0), *self._current_path)
             # SimpleReplayPool->FlexibleReplayPool
+            # 更新 pool.size
             self.pool.add_path({
                 key: value   # value.shape=(1000)
-                for key, value in last_path.items()
+                for key, value in last_path.items()  # 用来去除 infos
                 if key != 'infos'
             })
 
             self._last_n_paths.appendleft(last_path)
-
+            # 一个episode 的总 return
             self._max_path_return = max(self._max_path_return,
                                         self._path_return)
             self._last_path_return = self._path_return
